@@ -1,0 +1,34 @@
+[
+    {
+        "name": "umask",
+        "cmd": "umask",
+        "numprocs": 1,
+        "stdout" : "stdout",
+        "umask" : "077"
+    },
+    {
+        "name": "ping",
+        "cmd": "umask",
+        "numprocs": 3,
+        "stdout" : "stdout"
+    },
+    {
+        "name": "neverending",
+        "cmd": "./ticker",
+        "numprocs": 1,
+        "umask": "0222",
+        "autostart": true,
+        "autorestart": "never",
+        "exitcodes": [2],
+        "startretries": 3,
+        "starttime": 5,
+        "stopsignal": "SIGKILL",
+        "stoptime": 10,
+        "stdout": "/tmp/foo",
+        "stderr": "/tmp/bar",
+        "env" : {
+            "MyKey": "MyValue",
+            "foo": "bar"
+        }
+    }
+]
