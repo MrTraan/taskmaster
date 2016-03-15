@@ -1,7 +1,7 @@
 [
     {
-        "name": "test",
-        "cmd": "echo lol",
+        "name": "false",
+        "cmd": "false",
         "numprocs": 1
     },
     {
