@@ -1,0 +1,31 @@
+[
+    {
+        "name": "test",
+        "cmd": "echo lol",
+        "numprocs": 1
+    },
+    {
+        "name": "foo",
+        "cmd": "echo foo",
+        "numprocs": 1,
+        "autostart": true,
+        "autorestart": "never",
+        "exitcodes": [0, 2],
+        "startretries": 3,
+        "starttime": 5,
+        "stopsignal": "KILL",
+        "stoptime": 10,
+        "stdout": "foo",
+        "stderr": "bar",
+        "env" : [
+            {
+                "key" : "MyKey",
+                "value" : "MyValue"
+            },
+            {
+                "key" : "foo",
+                "value": "bar"
+            }
+        ]
+    }
+]
