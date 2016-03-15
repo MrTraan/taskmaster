@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"vogsphere.42.fr/taskmaster/backup_nathan/tmconf"
+	"vogshpere.42.fr/taskmaster.git/backup_nathan/tmconf"
 	"gopkg.in/readline.v1"
 	"os"
 	"os/exec"
@@ -78,7 +78,7 @@ func main() {
 	}
     time.Sleep(5 * time.Second)
 	fmt.Println("done")
-	
+
 	   line := ""
 	   for !strings.HasPrefix(line, "exit") {
 	       line, err = rl.Readline()
@@ -87,5 +87,5 @@ func main() {
 	       }
 	       fmt.Println(line)
 	   }
-	
+
 }

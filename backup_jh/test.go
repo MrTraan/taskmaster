@@ -18,8 +18,12 @@ func main() {
 		fmt.Fprintf(os.Stderr, "taskmaster: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Println(len(container), "procs found\n")
-	for _, v := range container {
+	testExec(container)
+}
+
+func testExec(proc []tmconf.ProcSettings) {
+	fmt.Println(len(proc), "procs found\n")
+	for _, v := range  proc {
 		fmt.Println(v)
 	}
 }
