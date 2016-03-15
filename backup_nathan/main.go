@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/MrTraan/taskmaster/tmconf"
+	"vogsphere.42.fr/taskmaster/backup_nathan/tmconf"
 	"gopkg.in/readline.v1"
 	"os"
 	"os/exec"
