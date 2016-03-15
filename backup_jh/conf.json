@@ -1,46 +1,22 @@
-{"Programs":
-	[
-		{"Name": "EchoLol",
-			"cmd": "/bin/echo lol",
-			"numprocs": 1,
-			"umask": 0,
-			"stdout": "/tmp/echo_log_out",
-			"stderr": "/tmp/echo_log_err",
-			"workingdir": "/tmp",
-			"stopsignal": 2,
-			"autostart": true,
-			"exitcodes": [0],
-			"starttime": 2,
-			"startretries": 2,
-			"autorestart": "Unexpected"
-		},
-		{"Name": "EchoToto",
-			"cmd": "/bin/echo toto",
-			"numprocs": 2,
-			"umask": 0,
-			"stdout": "/tmp/echo_log_out",
-			"stderr": "/tmp/echo_log_err",
-			"workingdir": "/tmp",
-			"stopsignal": 2,
-			"autostart": true,
-			"exitcodes": [0],
-			"starttime": 2,
-			"startretries": 2,
-			"autorestart": "Unexpected"
-		},
-		{"Name": "LSLR",
-			"cmd": "/bin/ls -lra /",
-			"numprocs": 2,
-			"umask": 0,
-			"stdout": "/tmp/echo_log_out",
-			"stderr": "/tmp/echo_log_err",
-			"workingdir": "/tmp",
-			"stopsignal": 2,
-			"autostart": true,
-			"exitcodes": [0],
-			"starttime": 2,
-			"startretries": 2,
-			"autorestart": "Unexpected"
-		}
-	]
-}
+[
+    {
+        "name": "test",
+        "cmd": "echo lol",
+        "numprocs": 1
+    },
+    {
+        "name": "foo",
+        "cmd": "echo foo",
+        "numprocs": 1,
+        "autostart": true,
+        "autorestart": "never",
+        "exitcodes": [0, 2],
+        "startretries": 3,
+        "starttime": 5,
+        "stopsignal": "KILL",
+        "stoptime": 10,
+        "stdout": "foo",
+        "stderr": "bar",
+        "env" : ["mykey=myvalue"]
+    }
+]

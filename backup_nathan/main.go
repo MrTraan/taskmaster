@@ -78,7 +78,7 @@ func main() {
 	}
     time.Sleep(5 * time.Second)
 	fmt.Println("done")
-	
+
 	   line := ""
 	   for !strings.HasPrefix(line, "exit") {
 	       line, err = rl.Readline()
@@ -87,5 +87,5 @@ func main() {
 	       }
 	       fmt.Println(line)
 	   }
-	
+
 }

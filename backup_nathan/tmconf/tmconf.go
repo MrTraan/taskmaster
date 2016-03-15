@@ -28,7 +28,7 @@ type ProcSettings struct {
 	Stoptime     int
 	Stdout       string
 	Stderr       string
-	Env          []EnvVar
+	Env          []string
 }
 
 func (s ProcSettings) String() string {

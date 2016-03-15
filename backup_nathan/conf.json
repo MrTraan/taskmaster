@@ -17,15 +17,6 @@
         "stoptime": 10,
         "stdout": "foo",
         "stderr": "bar",
-        "env" : [
-            {
-                "key" : "MyKey",
-                "value" : "MyValue"
-            },
-            {
-                "key" : "foo",
-                "value": "bar"
-            }
-        ]
+        "env" : ["mykey=myvalue"]
     }
 ]
