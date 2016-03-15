@@ -3,14 +3,35 @@ package main
 import (
 	"os"
 	"fmt"
-	"io/ioutil"
-	"vogshpere.42.fr/taskmaster.git/backup_nathan/tmconf"
+	"strings"
+	"os/exec"
+	"syscall"
+	"gopkg.in/readline.v1"
+	"vogsphere.42.fr/taskmaster.git/backup_nathan/tmconf"
+)
+
+var completion = readline.NewPrefixCompleter(
+	readline.PcItem("start"),
+	readline.PcItem("stop"),
+	readline.PcItem("exit"),
+	readline.PcItem("reload"),
 )
 
 func main() {
 	if len(os.Args) == 1 {
 		fmt.Fprintf(os.Stderr, "taskmaster: requires a config file\n")
 		return
+	}
+	rl, err := readline.NewEx(&readline.Config{
+		Prompt: "> ",
+		AutoComplete: completion,
+	})
+	for line, err := "", error(nil); !strings.HasPrefix(line, "exit"); {
+		line, err = rl.Readline()
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(line)
 	}
 	config_file := os.Args[1]
 	container, err := tmconf.ReadConfig(config_file)
@@ -22,17 +43,23 @@ func main() {
 }
 
 func testExec(proc []tmconf.ProcSettings) {
-	fmt.Println(len(proc), "procs found\n")
-	for _, v := range  proc {
-		fmt.Println(v)
+	for _, v := range proc {
+		cmd_splitted := strings.Split(v.Cmd, " ")
+		cmd := exec.Command(cmd_splitted[0], cmd_splitted[1:]...)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		err := cmd.Start()
+		if err != nil {
+			fmt.Println(v)
+		}
+		fmt.Println("Waiting")
+		err = cmd.Wait()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%s failed: %v\n", v.Cmd, err)
+		}
+		fmt.Println(cmd.ProcessState.String())
+		exit_value := cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
+		fmt.Println("\033[31mExit value:\033[0m", exit_value)
+		fmt.Println("Done")
 	}
-}
-
-func parseFile(filename string) []byte {
-	data, err := ioutil.ReadFile(filename)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "taskmaster: %v\n", err)
-		os.Exit(1)
-	}
-	return data
 }
