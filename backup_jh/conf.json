@@ -2,7 +2,8 @@
     {
         "name": "test",
         "cmd": "ls kfjlhs",
-        "numprocs": 1
+        "numprocs": 1,
+		"workingdir": "/tmp"
     },
     {
         "name": "foo",

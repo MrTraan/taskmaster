@@ -43,14 +43,17 @@ func main() {
 }
 
 func testExec(proc []tmconf.ProcSettings) {
-	for _, v := range proc {
+	for i, v := range proc {
 		cmd_splitted := strings.Split(v.Cmd, " ")
 		cmd := exec.Command(cmd_splitted[0], cmd_splitted[1:]...)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
+		cmd.Dir = proc[i].WorkingDir
+		fmt.Printf("launching %s in %s\n", proc[i].Cmd, cmd.Dir)
 		err := cmd.Start()
 		if err != nil {
 			fmt.Println(v)
+			continue
 		}
 		fmt.Println("Waiting")
 		err = cmd.Wait()
