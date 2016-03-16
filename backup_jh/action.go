@@ -7,11 +7,21 @@ import (
 
 func status(proc []ProcWrapper) {
 	for _, v := range proc {
-		fmt.Println("%s -> status %s\n", v.Cmd, v.Status)
+		fmt.Printf("%s: %s -> status %s\n", v.Name, v.Cmd, v.Status)
 	}
 }
 
-func reload(filename string) {
+func reload(filename string, proc []ProcWrapper) ([]tmconf.ProcSettings, error) {
+	conf, err := tmconf.ReadConfig(filename)
+	if err != nil {
+		return nil, err
+	}
+	// for i, _ := range proc {
+	// 	// if proc[i].ProcSettings != conf[i] {
+	// 	// 	//fmt.Printf("%s changed during reload", proc[i].Cmd)
+	// 	// }
+	// }
+	return conf, nil
 }
 
 func start(proc tmconf.ProcSettings) {

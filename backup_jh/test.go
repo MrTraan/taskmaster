@@ -7,6 +7,7 @@ import (
 	"log"
 	"os/exec"
 	"strings"
+	"time"
 	"syscall"
 	"vogsphere.42.fr/taskmaster.git/backup_nathan/tmconf"
 )
@@ -22,6 +23,8 @@ type ProcWrapper struct {
 	tmconf.ProcSettings
 	Command *exec.Cmd
 	Status  string
+	Time	time.Time
+	Signal	syscall.Signal
 }
 
 var completion = readline.NewPrefixCompleter(
@@ -33,35 +36,36 @@ var completion = readline.NewPrefixCompleter(
 )
 
 func main() {
+	var container []ProcWrapper
+	var tmp_procw ProcWrapper
+
 	if len(os.Args) == 1 {
 		fmt.Fprintf(os.Stderr, "taskmaster: requires a config file or an instruction\n")
 		return
 	}
-	testLogFile()
-	if strings.Compare(os.Args[1], "prompt") == 0 {
-		fmt.Println("test the prompt")
-		testPrompt()
-	} else {
-		config_file := os.Args[1]
-		tmp, err := tmconf.ReadConfig(config_file)
-
-		var container []ProcWrapper
-		var tmp_procw ProcWrapper
-		for _, v := range tmp {
-			tmp_procw.ProcSettings = v
-			tmp_procw.Status = STOPPED
-			container = append(container, tmp_procw)
-		}
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "taskmaster: %v\n", err)
-			os.Exit(1)
-		}
-		initCmd(container)
-		testExec(container)
+	log, err := testLogFile()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "taskmaster: log error: %v\n", err)
+		os.Exit(1)
 	}
+	initCmd(container)
+	testExec(container, log)
+	config_file := os.Args[1]
+	tmp, err := tmconf.ReadConfig(config_file)
+	for _, v := range tmp {
+		tmp_procw.ProcSettings = v
+		tmp_procw.Status = STOPPED
+		container = append(container, tmp_procw)
+	}
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "taskmaster: %v\n", err)
+		os.Exit(1)
+	}
+	testPrompt(container)
 }
 
-func testPrompt() {
+
+func testPrompt(proc []ProcWrapper) {
 	rl, err := readline.NewEx(&readline.Config{
 		Prompt:       "> ",
 		AutoComplete: completion,
@@ -75,19 +79,19 @@ func testPrompt() {
 		if err != nil {
 			panic(err)
 		}
+		if strings.HasPrefix(line, "status") {
+			status(proc)
+		}
 	}
 }
 
-func testLogFile() {
+func testLogFile() (*log.Logger, error) {
 	file, err := os.Create("log.txt")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Log error: %v\n", err)
-		return
+		return nil, err
 	}
 	log := log.New(file, "taskmaster> ", log.LstdFlags)
-	log.Output(2, "this is a test")
-	log.Output(2, "this is another test")
-	log.Output(2, "this is a lol test")
+	return log, nil
 }
 
 func lolTest() int {
@@ -106,24 +110,9 @@ func testArrayFunc() []func() int {
 	return test
 }
 
-func initCmd(proc []ProcWrapper) {
-	for i, _ := range proc {
-		arg := strings.Split(proc[i].Cmd, " ")
-		proc[i].Command = exec.Command(arg[0], arg[1:]...)
-		proc[i].Command.Stdout = os.Stdout
-		proc[i].Command.Stderr = os.Stderr
-		if proc[i].WorkingDir != "" {
-			proc[i].Command.Dir = proc[i].WorkingDir
-		} else {
-			proc[i].Command.Dir = "."
-		}
-		proc[i].Status = STOPPED
-	}
-}
-
-func testExec(proc []ProcWrapper) {
+func testExec(proc []ProcWrapper, log *log.Logger) {
 	for _, v := range proc {
-		fmt.Printf("launching %s in %s\n", v.Cmd, v.Command.Dir)
+		log.Output(2, fmt.Sprintf("launching %s in %s\n", v.Cmd, v.Command.Dir))
 		err := v.Command.Start()
 		if err != nil {
 			fmt.Println(v)
