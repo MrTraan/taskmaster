@@ -15,6 +15,7 @@ var completion = readline.NewPrefixCompleter(
 	readline.PcItem("stop"),
 	readline.PcItem("exit"),
 	readline.PcItem("reload"),
+	readline.PcItem("status"),
 )
 
 func main() {
@@ -22,24 +23,47 @@ func main() {
 		fmt.Fprintf(os.Stderr, "taskmaster: requires a config file\n")
 		return
 	}
+	testArrayFunc()
+	if strings.Compare(os.Args[1], "prompt") == 0 {
+		fmt.Println("test the prompt")
+		testPrompt()
+	} else {
+		config_file := os.Args[1]
+		container, err := tmconf.ReadConfig(config_file)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "taskmaster: %v\n", err)
+			os.Exit(1)
+		}
+		testExec(container)
+	}
+}
+
+func testPrompt() {
 	rl, err := readline.NewEx(&readline.Config{
 		Prompt: "> ",
 		AutoComplete: completion,
 	})
+	if err != nil {
+		fmt.Println("couldn't launch readline, program aborted")
+		os.Exit(1)
+	}
 	for line, err := "", error(nil); !strings.HasPrefix(line, "exit"); {
 		line, err = rl.Readline()
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(line)
 	}
-	config_file := os.Args[1]
-	container, err := tmconf.ReadConfig(config_file)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "taskmaster: %v\n", err)
-		os.Exit(1)
-	}
-	testExec(container)
+}
+
+func testArrayFunc() []func()int {
+	test := []func()int{}
+	test = append(test, func()int{return 1})
+	test = append(test, func()int{return 2})
+	test = append(test, func()int{return 3})
+	fmt.Println(test[0]())
+	fmt.Println(test[1]())
+	fmt.Println(test[2]())
+	return test
 }
 
 func testExec(proc []tmconf.ProcSettings) {
