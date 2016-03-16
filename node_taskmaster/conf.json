@@ -1,10 +1,10 @@
 [
     {
-        "name": "umask",
-        "cmd": "umask",
+        "name": "chat",
+        "cmd": "cat",
         "numprocs": 1,
-        "stdout" : "stdout",
-        "umask" : "077"
+        "stderr": "/tmp/chat",
+        "stdout": "stdout"
     },
     {
         "name": "ping",

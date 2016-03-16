@@ -1,6 +1,6 @@
 var fs = require("fs");
 
-const logFile = fs.createWriteStream("taskaster_logs.txt", {flags: "a+"});
+const logFile = fs.createWriteStream("taskmaster_logs.txt", {flags: "a+"});
 
 function logProcStart(name) {
     logFile.write(Date().toString() + " " + name + " has started\n");
