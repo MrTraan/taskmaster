@@ -10,6 +10,11 @@ import (
 	"vogsphere.42.fr/taskmaster.git/backup_nathan/tmconf"
 )
 
+type ProcWrapper struct {
+	tmconf.ProcSettings
+	Status		int
+}
+
 var completion = readline.NewPrefixCompleter(
 	readline.PcItem("start"),
 	readline.PcItem("stop"),
@@ -29,7 +34,14 @@ func main() {
 		testPrompt()
 	} else {
 		config_file := os.Args[1]
-		container, err := tmconf.ReadConfig(config_file)
+		tmp, err := tmconf.ReadConfig(config_file)
+		
+		var container []ProcWrapper
+		var test ProcWrapper
+		for _, v := range tmp {
+			test.ProcSettings = v
+			container = append(container, test)
+		}
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "taskmaster: %v\n", err)
 			os.Exit(1)
@@ -66,7 +78,7 @@ func testArrayFunc() []func()int {
 	return test
 }
 
-func testExec(proc []tmconf.ProcSettings) {
+func testExec(proc []ProcWrapper) {
 	for i, v := range proc {
 		cmd_splitted := strings.Split(v.Cmd, " ")
 		cmd := exec.Command(cmd_splitted[0], cmd_splitted[1:]...)
