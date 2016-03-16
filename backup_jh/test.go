@@ -1,18 +1,26 @@
 package main
 
 import (
-	"os"
 	"fmt"
-	"strings"
-	"os/exec"
-	"syscall"
 	"gopkg.in/readline.v1"
+	"os"
+	"os/exec"
+	"strings"
+	"syscall"
 	"vogsphere.42.fr/taskmaster.git/backup_nathan/tmconf"
+)
+
+const (
+	STARTING = "Starting"
+	RUNNING  = "Running"
+	STOPPED  = "Stopped"
+	FINISHED = "Finished"
 )
 
 type ProcWrapper struct {
 	tmconf.ProcSettings
-	Status		int
+	Command *exec.Cmd
+	Status  string
 }
 
 var completion = readline.NewPrefixCompleter(
@@ -28,31 +36,32 @@ func main() {
 		fmt.Fprintf(os.Stderr, "taskmaster: requires a config file\n")
 		return
 	}
-	testArrayFunc()
 	if strings.Compare(os.Args[1], "prompt") == 0 {
 		fmt.Println("test the prompt")
 		testPrompt()
 	} else {
 		config_file := os.Args[1]
 		tmp, err := tmconf.ReadConfig(config_file)
-		
+
 		var container []ProcWrapper
 		var test ProcWrapper
 		for _, v := range tmp {
 			test.ProcSettings = v
+			test.Status = STOPPED
 			container = append(container, test)
 		}
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "taskmaster: %v\n", err)
 			os.Exit(1)
 		}
+		initCmd(container)
 		testExec(container)
 	}
 }
 
 func testPrompt() {
 	rl, err := readline.NewEx(&readline.Config{
-		Prompt: "> ",
+		Prompt:       "> ",
 		AutoComplete: completion,
 	})
 	if err != nil {
@@ -67,37 +76,49 @@ func testPrompt() {
 	}
 }
 
-func testArrayFunc() []func()int {
-	test := []func()int{}
-	test = append(test, func()int{return 1})
-	test = append(test, func()int{return 2})
-	test = append(test, func()int{return 3})
+func testArrayFunc() []func() int {
+	test := []func() int{}
+	test = append(test, func() int { return 1 })
+	test = append(test, func() int { return 2 })
+	test = append(test, func() int { return 3 })
 	fmt.Println(test[0]())
 	fmt.Println(test[1]())
 	fmt.Println(test[2]())
 	return test
 }
 
+func initCmd(proc []ProcWrapper) {
+	for i, _ := range proc {
+		arg := strings.Split(proc[i].Cmd, " ")
+		proc[i].Command = exec.Command(arg[0], arg[1:]...)
+		proc[i].Command.Stdout = os.Stdout
+		proc[i].Command.Stderr = os.Stderr
+		if proc[i].WorkingDir != "" {
+			proc[i].Command.Dir = proc[i].WorkingDir
+		} else {
+			proc[i].Command.Dir = "."
+		}
+		proc[i].Status = STOPPED
+	}
+}
+
 func testExec(proc []ProcWrapper) {
-	for i, v := range proc {
-		cmd_splitted := strings.Split(v.Cmd, " ")
-		cmd := exec.Command(cmd_splitted[0], cmd_splitted[1:]...)
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		cmd.Dir = proc[i].WorkingDir
-		fmt.Printf("launching %s in %s\n", proc[i].Cmd, cmd.Dir)
-		err := cmd.Start()
+	for _, v := range proc {
+		fmt.Printf("launching %s in %s\n", v.Cmd, v.Command.Dir)
+		err := v.Command.Start()
 		if err != nil {
 			fmt.Println(v)
 			continue
 		}
+		fmt.Printf("Status of %s: %s\n", v.Cmd, v.Status)
 		fmt.Println("Waiting")
-		err = cmd.Wait()
+		err = v.Command.Wait()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%s failed: %v\n", v.Cmd, err)
 		}
-		fmt.Println(cmd.ProcessState.String())
-		exit_value := cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
+		v.Status = STOPPED
+		fmt.Printf("Status of %s: %s\n", v.Cmd, v.Status)
+		exit_value := v.Command.ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
 		fmt.Println("\033[31mExit value:\033[0m", exit_value)
 		fmt.Println("Done")
 	}
