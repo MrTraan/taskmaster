@@ -19,6 +19,7 @@ type ProcSettings struct {
 	Name         string
 	Cmd          string
 	Numprocs     int
+	WorkingDir	 string
 	Autostart    bool
 	Autorestart  string
 	Exitcodes    []int
