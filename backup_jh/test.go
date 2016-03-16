@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gopkg.in/readline.v1"
 	"os"
+	"log"
 	"os/exec"
 	"strings"
 	"syscall"
@@ -33,9 +34,10 @@ var completion = readline.NewPrefixCompleter(
 
 func main() {
 	if len(os.Args) == 1 {
-		fmt.Fprintf(os.Stderr, "taskmaster: requires a config file\n")
+		fmt.Fprintf(os.Stderr, "taskmaster: requires a config file or an instruction\n")
 		return
 	}
+	testLogFile()
 	if strings.Compare(os.Args[1], "prompt") == 0 {
 		fmt.Println("test the prompt")
 		testPrompt()
@@ -44,11 +46,11 @@ func main() {
 		tmp, err := tmconf.ReadConfig(config_file)
 
 		var container []ProcWrapper
-		var test ProcWrapper
+		var tmp_procw ProcWrapper
 		for _, v := range tmp {
-			test.ProcSettings = v
-			test.Status = STOPPED
-			container = append(container, test)
+			tmp_procw.ProcSettings = v
+			tmp_procw.Status = STOPPED
+			container = append(container, tmp_procw)
 		}
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "taskmaster: %v\n", err)
@@ -76,14 +78,31 @@ func testPrompt() {
 	}
 }
 
+func testLogFile() {
+	file, err := os.Create("log.txt")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Log error: %v\n", err)
+		return
+	}
+	log := log.New(file, "taskmaster> ", log.LstdFlags)
+	log.Output(2, "this is a test")
+	log.Output(2, "this is another test")
+	log.Output(2, "this is a lol test")
+}
+
+func lolTest() int {
+	return 4
+}
+
 func testArrayFunc() []func() int {
 	test := []func() int{}
 	test = append(test, func() int { return 1 })
 	test = append(test, func() int { return 2 })
 	test = append(test, func() int { return 3 })
-	fmt.Println(test[0]())
-	fmt.Println(test[1]())
-	fmt.Println(test[2]())
+	test = append(test, lolTest)
+	for _, v := range test {
+		fmt.Println(v())
+	}
 	return test
 }
 
@@ -110,6 +129,7 @@ func testExec(proc []ProcWrapper) {
 			fmt.Println(v)
 			continue
 		}
+		v.Status = RUNNING
 		fmt.Printf("Status of %s: %s\n", v.Cmd, v.Status)
 		fmt.Println("Waiting")
 		err = v.Command.Wait()

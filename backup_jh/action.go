@@ -5,14 +5,13 @@ import (
 	"vogsphere.42.fr/taskmaster.git/backup_nathan/tmconf"
 )
 
-func status(proc tmconf.ProcSettings) {
-	fmt.Println("gonna print the status")
-	fmt.Println(proc)
+func status(proc []ProcWrapper) {
+	for _, v := range proc {
+		fmt.Println("%s -> status %s\n", v.Cmd, v.Status)
+	}
 }
 
 func reload(filename string) {
-	fmt.Println("gonna reload a new file")
-	fmt.Println(filename)
 }
 
 func start(proc tmconf.ProcSettings) {
