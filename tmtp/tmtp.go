@@ -73,7 +73,3 @@ func InitClient(sPath string) (net.Conn, error) {
 func InitServer(sPath string) (net.Listener, error) {
     return net.Listen("unix", sPath)
 }
-
-func CloseServer(sPath string) error {
-    return os.Remove(sPath)
-}
