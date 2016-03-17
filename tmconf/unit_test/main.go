@@ -1,8 +1,8 @@
 package main
 
 import (
-	"os"
 	"fmt"
+	"os"
 	"vogsphere.42.fr/taskmaster.git/tmconf"
 )
 
