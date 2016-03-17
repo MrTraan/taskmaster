@@ -1,10 +1,10 @@
 package tmexec
 
-
 import (
 	"io"
-	"fmt"
+	"os"
 	"time"
+	"fmt"
 	"syscall"
 	"strings"
 	"os/exec"
@@ -37,26 +37,27 @@ func InitCmd(p []tmconf.ProcSettings) ([]ProcWrapper, error) {
 }
 
 func (p *ProcWrapper) getStdout() error {
-	var err error
-
-	if p.Stdout != "" {
-		p.StdoutPipe, err = p.Command.StdoutPipe()
-		if err != nil {
-			return err
-		}
+	if p.Stdout == "" {
+		return nil
 	}
+	file, err := os.OpenFile(p.Stdout, os.O_CREATE | os.O_WRONLY , 0666)
+	if err != nil {
+		return err
+	}
+	p.Command.Stdout = file
+	fmt.Println(p.Command.Stdout)
 	return nil
 }
 
 func (p *ProcWrapper) getStderr() error {
-	var err error
-
-	if p.Stderr != "" {
-		p.StderrPipe, err = p.Command.StderrPipe()
-		if err != nil {
-			return err
-		}
+	if p.Stderr == "" {
+		return nil
 	}
+	file, err := os.OpenFile(p.Stderr, os.O_CREATE | os.O_WRONLY, 0666)
+	if err != nil {
+		return err
+	}
+	p.Command.Stderr = file
 	return nil
 }
 

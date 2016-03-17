@@ -9,6 +9,7 @@ import (
 type ProcSettings struct {
 	Name         string   `json:Name`
 	Cmd          string   `json:cmd`
+	Umask		 int	  `json:umask`
 	Numprocs     int      `json:numprocs`
 	WorkingDir   string   `json:workingdir`
 	Autostart    bool     `json:autostart`

@@ -22,13 +22,24 @@ func main() {
 	}
 	c := 0
 	for _, v := range procW {
-		if v.Command == nil || v.StdoutPipe == nil || v.StderrPipe == nil {
+		if v.Command == nil {
 			c += 1
 		}
 	}
 	if c != 0 {
-		fmt.Printf("\033[31m%d cmds are unset\033[0m\n")
+		fmt.Printf("\033[31m%d cmds are unset\033[0m\n", c)
 	} else {
 		fmt.Println("\033[32mall process cmds are well set\033[0m")
 	}
+	for _, v := range procW {
+		fmt.Printf("launching %s\n", v.Cmd)
+		fmt.Println(v.Command.Stdout)
+		if n, err := v.Command.Stdout.Write([]byte("lololol")); err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println(n)
+		}
+		v.Command.Run()
+	}
+
 }
