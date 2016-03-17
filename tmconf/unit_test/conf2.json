@@ -1,0 +1,62 @@
+[
+    {
+	"name": "lolilol",
+	"cmd": "echo lol",
+	"numprocs": 6,
+	"autostart": true,
+	"autorestart": "never",
+	"exitcodes": [0, 2],
+	"startretries": 3,
+	"starttime": 5,
+	"stopsignal": "KILL",
+	"stoptime": 10,
+	"stdout": "/tmp/foo",
+	"stderr": "/tmp/bar",
+	"env" : ["mykey=myvalue"]
+    },
+    {
+        "name": "foo",
+        "cmd": "echo foo",
+        "numprocs": 3,
+        "autostart": true,
+        "autorestart": "never",
+        "exitcodes": [0, 2],
+        "startretries": 3,
+        "starttime": 5,
+        "stopsignal": "KILL",
+        "stoptime": 10,
+        "stdout": "/tmp/foo",
+        "stderr": "/tmp/bar",
+        "env" : ["mykey=myvalue"]
+    },
+	{
+		"name": "YFAITCHO",
+		"cmd": "echo YFAITCHO",
+		"numprocs": 8,
+		"autostart": true,
+		"autorestart": "never",
+		"exitcodes": [0, 2],
+		"startretries": 3,
+		"starttime": 5,
+		"stopsignal": "KILL",
+		"stoptime": 10,
+		"stdout": "/tmp/foo",
+		"stderr": "/tmp/bar",
+		"env" : ["mykey=myvalue"]
+	},
+	{
+		"name": "SASENTLASUEUR",
+		"cmd": "echo SASNETLASUEUR",
+		"numprocs": 12,
+		"autostart": true,
+		"autorestart": "never",
+		"exitcodes": [0, 2],
+		"startretries": 3,
+		"starttime": 5,
+		"stopsignal": "KILL",
+		"stoptime": 10,
+		"stdout": "/tmp/foo",
+		"stderr": "/tmp/bar",
+		"env" : ["mykey=myvalue"]
+	}
+]
