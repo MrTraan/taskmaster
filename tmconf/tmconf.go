@@ -3,6 +3,7 @@ package tmconf
 import (
 	"encoding/json"
 	"fmt"
+    "io/ioutil"
 )
 
 type ProcSettings struct {

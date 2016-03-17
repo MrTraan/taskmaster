@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 	"fmt"
-	"vogsphere.42.fr/taskmaster.git/taskmaster/tmconf"
+	"vogsphere.42.fr/taskmaster.git/tmconf"
 )
 
 func main() {
