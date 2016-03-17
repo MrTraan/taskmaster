@@ -29,6 +29,21 @@ func (s ProcSettings) String() string {
 		s.Starttime, s.Stopsignal, s.Stoptime, s.Stdout, s.Stderr, s.Env)
 }
 
+func GetProcSettings(filename string) (settings []ProcSettings, err error) {
+	conf, err := ReadConfig(filename)
+	if err != nil {
+		return nil, err
+	}
+	for i, _ := range conf {
+		if conf[i].Numprocs != 1 {
+			for j := 1; j < conf[i].Numprocs; j++ {
+				conf = append(conf, conf[i])
+			}
+		}
+	}
+	return conf, nil
+}
+
 func ReadConfig(filename string) (settings []ProcSettings, err error) {
 	var conf []ProcSettings
 
