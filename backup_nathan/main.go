@@ -13,8 +13,10 @@ import (
 
 var completion = readline.NewPrefixCompleter(
 	readline.PcItem("start"),
+    readline.PcItem("restart"),
+    readline.PcItem("status"),
 	readline.PcItem("stop"),
-	readline.PcItem("exit"),
+	readline.PcItem("shutdown"),
 )
 
 func startNewProc(conf tmconf.ProcSettings) {
