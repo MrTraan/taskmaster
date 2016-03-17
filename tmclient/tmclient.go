@@ -1,10 +1,12 @@
 package main
 
 import (
-    "vogsphere.42.fr/taskmaster.git/tmtp"
+	"vogsphere.42.fr/taskmaster.git/tmtp"
+    "vogsphere.42.fr/taskmaster.git/tmconf"
     "fmt"
     "gopkg.in/readline.v1"
     "strings"
+	"os"
 )
 
 var completion = readline.NewPrefixCompleter(
@@ -18,6 +20,17 @@ var completion = readline.NewPrefixCompleter(
 const socketPath = "/tmp/tm.sock"
 
 func main() {
+	// A AMELIORER
+	if len(os.Args) == 1 {
+		fmt.Fprintf(os.Stderr, "requires a config file")
+		os.Exit(1)
+	}
+	_, err := tmconf.GetProcSettings(os.Args[1])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "parsing error")
+		os.Exit(1)
+	}
+
     cli, err := tmtp.InitClient(socketPath)
     if err != nil {
         fmt.Println("error on creating client: ", err)
@@ -34,7 +47,7 @@ func main() {
         return
     }
     defer rl.Close()
-    
+
     for {
         line, err := rl.Readline()
         if err != nil {

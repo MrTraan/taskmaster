@@ -4,7 +4,6 @@ import (
 	"io"
 	"os"
 	"time"
-	"fmt"
 	"syscall"
 	"strings"
 	"os/exec"
@@ -45,7 +44,6 @@ func (p *ProcWrapper) getStdout() error {
 		return err
 	}
 	p.Command.Stdout = file
-	fmt.Println(p.Command.Stdout)
 	return nil
 }
 

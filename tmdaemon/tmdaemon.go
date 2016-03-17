@@ -2,12 +2,32 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"net"
 	"vogsphere.42.fr/taskmaster.git/tmtp"
+	"vogsphere.42.fr/taskmaster.git/tmconf"
+	"vogsphere.42.fr/taskmaster.git/tmexec"
     "time"
 )
 
 func main() {
+	if len(os.Args) == 1 {
+		fmt.Fprintf(os.Stderr, "requires a config file")
+		os.Exit(1)
+	}
+	conf, err := tmconf.GetProcSettings(os.Args[1])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "parsing error")
+		os.Exit(1)
+	}
+	procW, err := tmexec.InitCmd(conf)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "cmd error")
+		os.Exit(1)
+	}
+	for _, v := range procW {
+		fmt.Println(v)
+	}
 	serv, err := tmtp.InitServer("/tmp/tm.sock")
 	if err != nil {
 		fmt.Println("Coudlnt launch server: ", err)
@@ -26,7 +46,7 @@ func main() {
 			if req.RequestType == tmtp.ReqShutdown {
 				fmt.Println("Turning off daemon")
                 cResponse <- "You turned me off!"
-                time.Sleep(100 * time.Millisecond)      
+                time.Sleep(100 * time.Millisecond)
 				return
 			}
 			fmt.Println("Main received request: ", req)
