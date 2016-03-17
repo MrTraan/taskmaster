@@ -22,9 +22,13 @@ func main() {
 		fmt.Fprintf(os.Stderr, "requires a config file\n")
 		os.Exit(1)
 	}
-	conf, err := tmconf.GetProcSettings(os.Args[1])
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+	for i := 1; i < len(os.Args); i++ {
+		fmt.Println("\n\033[31mParsing\033[0m", os.Args[i])
+		conf, err := tmconf.GetProcSettings(os.Args[i])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		}
+		countProc(conf)
 	}
-	countProc(conf)
+
 }
