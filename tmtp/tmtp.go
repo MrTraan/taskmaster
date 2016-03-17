@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
     "net"
-    "os"
 )
 
 const (
@@ -46,7 +45,7 @@ func parseRequestType(s string) (int32, error) {
 }
 
 func (r Request) String() string {
-	return fmt.Sprintf("Request: %d\nBody: %v",
+	return fmt.Sprintf("Request: %d, Body: %v",
 		r.RequestType, r.Body)
 }
 

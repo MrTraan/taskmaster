@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"vogsphere.42.fr/taskmaster.git/tmtp"
+    "time"
 )
 
 func main() {
@@ -25,6 +26,7 @@ func main() {
 			if req.RequestType == tmtp.ReqShutdown {
 				fmt.Println("Turning off daemon")
                 cResponse <- "You turned me off!"
+                time.Sleep(100 * time.Millisecond)      
 				return
 			}
 			fmt.Println("Main received request: ", req)
@@ -48,22 +50,28 @@ func acceptConnections(serv net.Listener, c chan net.Conn) {
 func handleConnection(conn net.Conn, cIn chan tmtp.Request, cOut chan string){
 	for {
 		data := make([]byte, 512)
-
 		n, err := conn.Read(data)
+        if n == 0 {
+            fmt.Println("Connection closed by client")
+            return
+        }
 		if err != nil {
+            if err.Error() == "EOF" {
+                fmt.Println("Connection closed by client")
+                return
+            }
 			fmt.Println("error on reading data: ", err)
 		}
 		req, err := tmtp.Decode(data[:n])
 		if err != nil {
 			fmt.Println("error on decoding data: ", err)
 		}
-		cIn <- req
-        
+        cIn <- req
+
         response := []byte(<- cOut)
         n, err = conn.Write(response)
         if err != nil {
             fmt.Println("Error on writing response: ", err)
         }
-        fmt.Printf("Wrote %d to client\n", n)
 	}
 }

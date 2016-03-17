@@ -15,12 +15,16 @@ var completion = readline.NewPrefixCompleter(
 	readline.PcItem("shutdown"),
 )
 
+const socketPath = "/tmp/tm.sock"
+
 func main() {
-    cli, err := tmtp.InitClient("/tmp/tm.sock")
+    cli, err := tmtp.InitClient(socketPath)
     if err != nil {
         fmt.Println("error on creating client: ", err)
+        fmt.Println("Make sure taskmaster server is running before launching client")
         return
     }
+    defer cli.Close()
     rl, err := readline.NewEx(&readline.Config{
         Prompt : "tm> ",
         AutoComplete: completion,
@@ -48,19 +52,26 @@ func main() {
         b, err := cli.Write(data)
         if err != nil {
             fmt.Println("Error on sending data: ", err)
-            fmt.Println("Check if server is started")
-            return
+            fmt.Println("Trying to reload connection")
+            cli.Close()
+            cli, err = tmtp.InitClient(socketPath)
+            if err != nil {
+                fmt.Println("Coudlnt reload connection: ", err)
+                fmt.Println("Make sure taskmaster server is running")
+                return
+            }
+            fmt.Println("Connection was successfully reloaded")
+            continue
         }
         if b != len(data) {
             fmt.Println("Data sent is corrupted!")
             continue
         }
-        fmt.Printf("sent %d bytes to server\n", b)
         response := make([]byte, 512)
         b, err = cli.Read(response)
         if err != nil {
             fmt.Println("Error when reading response: ", err)
         }
-        fmt.Printf("got %d bytes from server\nResponse: %s\n", b, string(response))
+        fmt.Printf("Response: %s\n", string(response))
     }
 }
