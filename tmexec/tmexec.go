@@ -1,7 +1,9 @@
 package tmexec
 
+
 import (
 	"io"
+	"fmt"
 	"time"
 	"syscall"
 	"strings"
@@ -19,17 +21,27 @@ type ProcWrapper struct {
 	Signal		syscall.Signal
 }
 
-func InitCmd(p []ProcWrapper) error {
+func InitCmd(p []tmconf.ProcSettings) ([]ProcWrapper, error) {
+	var procW	[]ProcWrapper
+	var tmp		ProcWrapper
+
 	for i, _ := range p {
-		err := p[i].initCmd()
+		tmp.ProcSettings = p[i]
+		err := tmp.initCmd()
 		if err != nil {
-			return err
+			return nil, err
 		}
+		if tmp.Command == nil {
+			fmt.Println("in InitCmd, command is empty")
+		} else if tmp.StderrPipe == nil {
+			fmt.Println("in InitCmd, Stderr is nil")
+		}
+		procW = append(procW, tmp)
 	}
-	return nil
+	return procW, nil
 }
 
-func (p ProcWrapper) getStdout() error {
+func (p *ProcWrapper) getStdout() error {
 	var err error
 
 	if p.Stdout != "" {
@@ -41,7 +53,7 @@ func (p ProcWrapper) getStdout() error {
 	return nil
 }
 
-func (p ProcWrapper) getStderr() error {
+func (p *ProcWrapper) getStderr() error {
 	var err error
 
 	if p.Stderr != "" {
@@ -53,18 +65,28 @@ func (p ProcWrapper) getStderr() error {
 	return nil
 }
 
-func (p ProcWrapper) initCmd() error {
+/*
+** initCmd set :
+** - Stdin / Stdout
+** - WorkingDir
+** - Environment
+*/
+func (p *ProcWrapper) initCmd() error {
 	args := strings.Split(p.Cmd, " ")
 	p.Command = exec.Command(args[0], args[1:]...)
+	if p.Command == nil {
+		fmt.Println("no command to execute")
+	}
 	if err := p.getStdout(); err != nil {
 		return err
 	}
 	if err := p.getStderr(); err != nil {
 		return err
 	}
-	// need to init stdin and stdout
-	// need to set the directory
-	// need to set the status
-	// need to set the time ??
+	if p.WorkingDir == "" {
+		p.WorkingDir = "."
+	}
+	p.Command.Dir = p.WorkingDir
+	p.Command.Env = p.Env
 	return nil
 }
