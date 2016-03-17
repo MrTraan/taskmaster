@@ -31,11 +31,6 @@ func InitCmd(p []tmconf.ProcSettings) ([]ProcWrapper, error) {
 		if err != nil {
 			return nil, err
 		}
-		if tmp.Command == nil {
-			fmt.Println("in InitCmd, command is empty")
-		} else if tmp.StderrPipe == nil {
-			fmt.Println("in InitCmd, Stderr is nil")
-		}
 		procW = append(procW, tmp)
 	}
 	return procW, nil
@@ -74,9 +69,6 @@ func (p *ProcWrapper) getStderr() error {
 func (p *ProcWrapper) initCmd() error {
 	args := strings.Split(p.Cmd, " ")
 	p.Command = exec.Command(args[0], args[1:]...)
-	if p.Command == nil {
-		fmt.Println("no command to execute")
-	}
 	if err := p.getStdout(); err != nil {
 		return err
 	}
