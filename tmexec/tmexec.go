@@ -64,6 +64,7 @@ func (p *ProcWrapper) getStderr() error {
 ** - Stdin / Stdout
 ** - WorkingDir
 ** - Environment
+** /!!\ umask still need to be set
 */
 func (p *ProcWrapper) initCmd() error {
 	args := strings.Split(p.Cmd, " ")

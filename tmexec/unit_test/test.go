@@ -33,12 +33,6 @@ func main() {
 	}
 	for _, v := range procW {
 		fmt.Printf("launching %s\n", v.Cmd)
-		fmt.Println(v.Command.Stdout)
-		if n, err := v.Command.Stdout.Write([]byte("lololol")); err != nil {
-			fmt.Println(err)
-		} else {
-			fmt.Println(n)
-		}
 		v.Command.Run()
 	}
 

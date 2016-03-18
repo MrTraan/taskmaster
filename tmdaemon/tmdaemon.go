@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+	// init config file
 	if len(os.Args) == 1 {
 		fmt.Fprintf(os.Stderr, "requires a config file")
 		os.Exit(1)
@@ -28,6 +29,14 @@ func main() {
 	for _, v := range procW {
 		fmt.Println(v)
 	}
+	// init logfile
+	logfile, err := CreateLogFile("log.txt")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Logfile: %v\n", err)
+		os.Exit(1)
+	}
+	logfile.Printf("log file created\n")
+	// init server connection
 	serv, err := tmtp.InitServer("/tmp/tm.sock")
 	if err != nil {
 		fmt.Println("Coudlnt launch server: ", err)
