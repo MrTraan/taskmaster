@@ -11,11 +11,19 @@ import (
 )
 
 func main() {
-	// init config file
+	// init log file
+	logfile, err := CreateLogFile("log.txt")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Logfile: %v\n", err)
+		os.Exit(1)
+	}
+	logfile.Printf("log file created\n")
 	if len(os.Args) == 1 {
 		fmt.Fprintf(os.Stderr, "requires a config file")
 		os.Exit(1)
 	}
+
+	// init config file
 	conf, err := tmconf.GetProcSettings(os.Args[1])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "parsing error")
@@ -27,15 +35,15 @@ func main() {
 		os.Exit(1)
 	}
 	for _, v := range procW {
-		fmt.Println(v)
+		fmt.Println("launching", v.Name)
+		if err := tmexec.LaunchCmd(&v); err != nil {
+			fmt.Println(err)
+			logfile.Printf("%s failed to launched", v.Name)
+		} else {
+			logfile.Printf("%s launched", v.Name)
+		}
 	}
-	// init logfile
-	logfile, err := CreateLogFile("log.txt")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Logfile: %v\n", err)
-		os.Exit(1)
-	}
-	logfile.Printf("log file created\n")
+
 	// init server connection
 	serv, err := tmtp.InitServer("/tmp/tm.sock")
 	if err != nil {
@@ -55,6 +63,7 @@ func main() {
 			if req.RequestType == tmtp.ReqShutdown {
 				fmt.Println("Turning off daemon")
                 cResponse <- "You turned me off!"
+				logfile.Printf("daemon exited\n")
                 time.Sleep(100 * time.Millisecond)
 				return
 			}

@@ -55,3 +55,7 @@ func ReadConfig(filename string) (settings []ProcSettings, err error) {
 	err = json.Unmarshal(data, &conf)
 	return conf, err
 }
+
+// ajouter le reload ici ?
+// merge la nouvelle liste de processus avec l'ancienne
+// et creer une nouvelle liste de tous les processus a relancer ??

@@ -1,0 +1,4 @@
+taskmaster> 2016/03/19 17:47:58 test failed to launched
+taskmaster> 2016/03/19 17:47:58 foo launched
+taskmaster> 2016/03/19 17:47:58 log file created
+taskmaster> 2016/03/19 17:48:20 daemon exited

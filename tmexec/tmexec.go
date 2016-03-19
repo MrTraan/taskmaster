@@ -5,9 +5,16 @@ import (
 	"os"
 	"time"
 	"syscall"
+	"errors"
 	"strings"
 	"os/exec"
 	"vogsphere.42.fr/taskmaster.git/tmconf"
+)
+
+const (
+	STARTING = "staring"
+	RUNNING = "running"
+	STOPPED = "stopped"
 )
 
 type ProcWrapper struct {
@@ -18,6 +25,26 @@ type ProcWrapper struct {
 	Status  	string
 	Time		time.Time
 	Signal		syscall.Signal
+}
+
+func LaunchCmd(p *ProcWrapper) error {
+	var err error
+
+	if p.Status != STOPPED && p.Status != "" {
+		err = errors.New("Processus already launched")
+		return err
+	}
+	p.Status = STARTING
+	err = p.Command.Start()
+	if err != nil {
+		p.Status = STOPPED
+		return err
+	}
+	p.Status = RUNNING
+	if err = p.Command.Wait(); err != nil {
+		return err
+	}
+	return nil
 }
 
 func InitCmd(p []tmconf.ProcSettings) ([]ProcWrapper, error) {
