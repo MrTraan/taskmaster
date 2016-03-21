@@ -3,6 +3,7 @@ package tmexec
 import (
 	"io"
 	"os"
+	"fmt"
 	"time"
 	"syscall"
 	"errors"
@@ -12,7 +13,7 @@ import (
 )
 
 const (
-	STARTING = "staring"
+	STARTING = "starting"
 	RUNNING = "running"
 	STOPPED = "stopped"
 )
@@ -20,6 +21,7 @@ const (
 type ProcWrapper struct {
 	tmconf.ProcSettings
 	Command		*exec.Cmd
+	Pid			int
 	StdoutPipe	io.ReadCloser
 	StderrPipe	io.ReadCloser
 	Status  	string
@@ -27,7 +29,7 @@ type ProcWrapper struct {
 	Signal		syscall.Signal
 }
 
-func LaunchCmd(p *ProcWrapper) error {
+func StartCmd(p *ProcWrapper) error {
 	var err error
 
 	if p.Status != STOPPED && p.Status != "" {
@@ -35,6 +37,7 @@ func LaunchCmd(p *ProcWrapper) error {
 		return err
 	}
 	p.Status = STARTING
+	p.Time = time.Now()
 	err = p.Command.Start()
 	if err != nil {
 		p.Status = STOPPED
@@ -44,7 +47,21 @@ func LaunchCmd(p *ProcWrapper) error {
 	if err = p.Command.Wait(); err != nil {
 		return err
 	}
+	p.Status = STOPPED
 	return nil
+}
+
+func Status(proc []ProcWrapper, cmd string) {
+	for _, v := range proc {
+		if cmd == "" || v.Name == cmd {
+			fmt.Printf("%-10s %s", v.Name, v.Status)
+			if v.Status == RUNNING {
+				fmt.Printf("%d %s\n", v.Pid, time.Since(v.Time))
+			} else {
+				fmt.Printf("\n")
+			}
+		}
+	}
 }
 
 func InitCmd(p []tmconf.ProcSettings) ([]ProcWrapper, error) {

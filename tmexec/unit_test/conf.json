@@ -1,7 +1,7 @@
 [
     {
         "name": "test",
-        "cmd": "ls kfjlhs",
+        "cmd": "ls -lR /",
         "numprocs": 4,
 		"workingdir": "/tmp",
 		"stdout": "/tmp/test_foo",

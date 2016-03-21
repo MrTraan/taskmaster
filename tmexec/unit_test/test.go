@@ -20,20 +20,15 @@ func main() {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "InitCmd: %v\n", err)
 	}
-	c := 0
-	for _, v := range procW {
-		if v.Command == nil {
-			c += 1
-		}
+	for i, _ := range procW {
+		go tmexec.StartCmd(&procW[i])
 	}
-	if c != 0 {
-		fmt.Printf("\033[31m%d cmds are unset\033[0m\n", c)
-	} else {
-		fmt.Println("\033[32mall process cmds are well set\033[0m")
-	}
-	for _, v := range procW {
-		fmt.Printf("launching %s\n", v.Cmd)
-		v.Command.Run()
-	}
-
+	fmt.Println("new status")
+	tmexec.Status(procW, "")
+	fmt.Println("new status")
+	tmexec.Status(procW, "lol")
+	fmt.Println("new status")
+	tmexec.Status(procW, "test")
+	fmt.Println("new status")
+	tmexec.Status(procW, " ")
 }

@@ -34,14 +34,9 @@ func main() {
 		fmt.Fprintf(os.Stderr, "cmd error")
 		os.Exit(1)
 	}
-	for _, v := range procW {
-		fmt.Println("launching", v.Name)
-		if err := tmexec.LaunchCmd(&v); err != nil {
-			fmt.Println(err)
-			logfile.Printf("%s failed to launched", v.Name)
-		} else {
-			logfile.Printf("%s launched", v.Name)
-		}
+	for i, _ := range procW {
+		fmt.Println("launching", procW[i].Name)
+		go tmexec.StartCmd(&procW[i])
 	}
 
 	// init server connection
